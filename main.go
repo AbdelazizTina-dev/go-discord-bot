@@ -36,6 +36,10 @@ var (
 				},
 			},
 		},
+		{
+			Name:        "kayn-update",
+			Description: "Will tell you if there is an update in valo :)",
+		},
 	}
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
@@ -66,6 +70,14 @@ var (
 
 			// Play the YouTube audio
 			go playYouTubeAudio(ytbURL, vc)
+		},
+		"kayn-update": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Ghodwa nakhdemha",
+				},
+			})
 		}}
 )
 
