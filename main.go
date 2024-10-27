@@ -75,7 +75,7 @@ var (
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "Ghodwa nakhdemha",
+					Content: "Ghodwa nakhdemha!",
 				},
 			})
 		}}
