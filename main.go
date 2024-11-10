@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 
+	"github.com/AbdelazizTina-dev/go-discord-bot/scraper"
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
 )
@@ -29,12 +31,52 @@ var (
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"kayn-update": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "Ghodwa nakhdemha!",
-				},
+			// Acknowledge the interaction immediately, telling Discord the bot is working on it.
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 			})
+
+			if err != nil {
+				fmt.Println("Error acknowledging interaction:", err)
+				return
+			}
+
+			patch := scraper.GetPatchNotes()
+
+			embed := &discordgo.MessageEmbed{
+				Title:       "VALORANT Patch Notes",
+				Description: "Check out the latest patch notes for VALORANT!",
+				Color:       0x00ff00, // Green color (in hexadecimal)
+				Fields: []*discordgo.MessageEmbedField{
+					{
+						Name:   "Patch Version",
+						Value:  patch.Version, // Replace with dynamic version number
+						Inline: true,
+					},
+					{
+						Name:   "Release Date",
+						Value:  patch.Date, // Replace with dynamic date
+						Inline: true,
+					},
+					{
+						Name:   "Patch Description",
+						Value:  patch.Description, // Summarized details
+						Inline: false,
+					},
+				},
+				URL: patch.Link, // Link to full patch notes
+			}
+
+			_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Content:    nil, // Content can be nil if you're only sending an embed
+				Embeds:     &[]*discordgo.MessageEmbed{embed},
+				Components: nil, // No components are needed in this case
+			})
+
+			if err != nil {
+				fmt.Println("Error sending updated embed:", err)
+			}
+
 		}}
 )
 
@@ -54,6 +96,7 @@ func init() {
 }
 
 func main() {
+	scraper.GetPatchNotes()
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
