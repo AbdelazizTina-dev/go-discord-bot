@@ -1,1 +1,1 @@
-web: ./go-discord-bot
+web: go-discord-bot
