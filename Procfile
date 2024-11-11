@@ -1,1 +1,1 @@
-web: go-discord-bot
+worker: go-discord-bot
